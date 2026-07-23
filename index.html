@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="초등학교 2학년을 위한 신나는 곱셈구구 연습 게임"
+    />
+    <title>구구별 대모험</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@500;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="brand" id="homeButton" aria-label="처음 화면으로">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span>구구별 대모험</span>
+        </button>
+        <div class="top-actions">
+          <div class="star-wallet" aria-label="모은 별">
+            <span aria-hidden="true">⭐</span>
+            <strong id="totalStars">0</strong>
+          </div>
+          <button class="sound-button" id="soundButton" aria-label="소리 끄기">
+            <span id="soundIcon" aria-hidden="true">♪</span>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <section class="screen home-screen active" id="homeScreen">
+          <div class="hero">
+            <div class="hero-art" aria-hidden="true"></div>
+            <div class="hero-content">
+              <p class="eyebrow"><span>2학년 2학기</span> · 곱셈구구</p>
+              <h1>별을 모으며<br /><em>구구단을 정복해요!</em></h1>
+              <p class="hero-copy">
+                오늘 도전할 단을 고르고<br class="mobile-only" />
+                구구별 여행을 떠나 볼까요?
+              </p>
+              <button class="primary-button" id="startChoosingButton">
+                모험 시작하기 <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mission-panel" id="missionPanel">
+            <div class="section-heading">
+              <div>
+                <p class="kicker">오늘의 모험</p>
+                <h2>어떤 단을 연습할까요?</h2>
+              </div>
+              <p class="mini-guide">하나 또는 여러 개를 골라도 좋아요!</p>
+            </div>
+
+            <div class="dan-grid" id="danGrid" aria-label="연습할 구구단 선택"></div>
+
+            <div class="mission-footer">
+              <div class="selection-summary">
+                <span class="small-label">선택한 단</span>
+                <strong id="selectedSummary">아직 없어요</strong>
+              </div>
+              <button class="play-button" id="playButton" disabled>
+                <span class="play-icon" aria-hidden="true">▶</span>
+                10문제 도전!
+              </button>
+            </div>
+          </div>
+
+          <div class="learning-tip">
+            <span class="tip-icon" aria-hidden="true">💡</span>
+            <div>
+              <strong>구구별 탐험대의 꿀팁</strong>
+              <p>처음이라면 2단과 5단부터 차근차근 시작해 보세요.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen game-screen" id="gameScreen" aria-live="polite">
+          <div class="game-top">
+            <button class="back-button" id="quitButton">
+              <span aria-hidden="true">‹</span> 그만하기
+            </button>
+            <div class="round-label" id="roundLabel">2단 모험</div>
+            <div class="score-pill">
+              <span aria-hidden="true">⭐</span>
+              <strong id="roundStars">0</strong>
+            </div>
+          </div>
+
+          <div class="progress-area">
+            <div class="progress-text">
+              <strong id="questionCount">1 / 10</strong>
+              <span id="streakText">연속 정답에 도전!</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="game-stage">
+            <div class="mascot-card" id="mascotCard">
+              <div class="speech-bubble" id="speechBubble">천천히 생각해 봐!</div>
+              <div class="mini-mascot" aria-hidden="true">🐥</div>
+            </div>
+
+            <div class="question-card" id="questionCard">
+              <p class="question-prompt">빈칸에 알맞은 수는?</p>
+              <div class="equation" aria-label="곱셈 문제">
+                <span id="factorA">2</span>
+                <span class="operator">×</span>
+                <span id="factorB">3</span>
+                <span class="operator">=</span>
+                <span class="answer-box" id="answerBox">?</span>
+              </div>
+              <div class="choice-grid" id="choiceGrid"></div>
+              <p class="keyboard-hint">숫자 키로 답하고 Enter를 눌러도 돼요</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen result-screen" id="resultScreen">
+          <div class="result-card">
+            <div class="confetti" aria-hidden="true">
+              <span>✦</span><span>●</span><span>★</span><span>●</span><span>✦</span>
+            </div>
+            <div class="result-badge" id="resultBadge">🏆</div>
+            <p class="kicker">모험 완료!</p>
+            <h2 id="resultTitle">구구별이 반짝반짝!</h2>
+            <p class="result-message" id="resultMessage">정말 멋지게 해냈어요.</p>
+
+            <div class="result-score">
+              <div>
+                <span>정답</span>
+                <strong><b id="correctCount">0</b> / 10</strong>
+              </div>
+              <div class="divider"></div>
+              <div>
+                <span>새로 모은 별</span>
+                <strong>⭐ <b id="earnedStars">0</b></strong>
+              </div>
+              <div class="divider"></div>
+              <div>
+                <span>최고 연속 정답</span>
+                <strong>🔥 <b id="bestStreak">0</b></strong>
+              </div>
+            </div>
+
+            <div class="review-box" id="reviewBox" hidden>
+              <strong>한 번 더 보면 완벽해요!</strong>
+              <div id="reviewList"></div>
+            </div>
+
+            <div class="result-actions">
+              <button class="secondary-button" id="chooseAgainButton">다른 단 고르기</button>
+              <button class="primary-button" id="retryButton">한 번 더 도전! <span>↻</span></button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div class="feedback-overlay" id="feedbackOverlay" aria-hidden="true">
+        <div class="feedback-pop" id="feedbackPop">
+          <span class="feedback-icon" id="feedbackIcon">⭐</span>
+          <strong id="feedbackTitle">정답!</strong>
+          <p id="feedbackDetail">아주 잘했어요!</p>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
