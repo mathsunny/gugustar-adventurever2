@@ -11,6 +11,7 @@ await Promise.all([
   cp("index.html", "dist/index.html"),
   cp("styles.css", "dist/styles.css"),
   cp("app.js", "dist/app.js"),
+  cp("config.js", "dist/config.js"),
   cp("assets/multiplication-sky.png", "dist/assets/multiplication-sky.png"),
   cp(".openai/hosting.json", "dist/.openai/hosting.json"),
   writeFile(

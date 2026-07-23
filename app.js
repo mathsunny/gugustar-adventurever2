@@ -1,5 +1,6 @@
 const QUESTIONS_PER_ROUND = 10;
 const DAN_VALUES = [2, 3, 4, 5, 6, 7, 8, 9];
+const RESULTS_ENDPOINT = window.GUGUSTAR_RESULTS_ENDPOINT || "";
 
 const state = {
   selectedDans: new Set(),
@@ -12,6 +13,9 @@ const state = {
   mistakes: [],
   locked: false,
   soundOn: true,
+  studentClass: "",
+  studentNumber: "",
+  resultSubmitted: false,
   totalStars: Number(localStorage.getItem("gugustar-total") || 0),
   mastered: JSON.parse(localStorage.getItem("gugustar-mastered") || "{}"),
 };
@@ -40,6 +44,10 @@ const elements = {
   feedbackTitle: document.querySelector("#feedbackTitle"),
   feedbackDetail: document.querySelector("#feedbackDetail"),
   toast: document.querySelector("#toast"),
+  studentClass: document.querySelector("#studentClass"),
+  studentNumber: document.querySelector("#studentNumber"),
+  submitResultButton: document.querySelector("#submitResultButton"),
+  submitStatus: document.querySelector("#submitStatus"),
 };
 
 function shuffle(items) {
@@ -88,7 +96,18 @@ function toggleDan(dan, button) {
   elements.selectedSummary.textContent = selected.length
     ? selected.map((value) => `${value}단`).join(", ")
     : "아직 없어요";
-  elements.playButton.disabled = !selected.length;
+  updatePlayEligibility();
+}
+
+function updatePlayEligibility() {
+  const studentClass = elements.studentClass.value;
+  const studentNumber = Number(elements.studentNumber.value);
+  const hasStudentInfo =
+    Boolean(studentClass) &&
+    Number.isInteger(studentNumber) &&
+    studentNumber >= 1 &&
+    studentNumber <= 40;
+  elements.playButton.disabled = !state.selectedDans.size || !hasStudentInfo;
 }
 
 function buildQuestions() {
@@ -130,7 +149,14 @@ function makeChoices(question) {
 }
 
 function startGame() {
-  if (!state.selectedDans.size) return;
+  updatePlayEligibility();
+  if (elements.playButton.disabled) {
+    showToast("반·번호와 연습할 단을 모두 선택해 주세요");
+    return;
+  }
+  state.studentClass = elements.studentClass.value;
+  state.studentNumber = String(Number(elements.studentNumber.value));
+  state.resultSubmitted = false;
   state.questions = buildQuestions();
   state.questionIndex = 0;
   state.correct = 0;
@@ -254,6 +280,11 @@ function finishGame() {
   document.querySelector("#correctCount").textContent = state.correct;
   document.querySelector("#earnedStars").textContent = state.roundStars;
   document.querySelector("#bestStreak").textContent = state.bestStreak;
+  elements.submitResultButton.disabled = false;
+  elements.submitResultButton.classList.remove("submitted");
+  elements.submitResultButton.innerHTML =
+    '<span aria-hidden="true">📨</span> 선생님께 제출하기';
+  elements.submitStatus.textContent = `${state.studentClass}반 ${state.studentNumber}번의 결과예요.`;
 
   const title = document.querySelector("#resultTitle");
   const message = document.querySelector("#resultMessage");
@@ -290,6 +321,63 @@ function finishGame() {
 
   showScreen(elements.resultScreen);
   playTone(state.correct >= 7 ? "finish" : "start");
+}
+
+async function submitResult() {
+  if (state.resultSubmitted) return;
+  if (!RESULTS_ENDPOINT) {
+    elements.submitStatus.textContent =
+      "아직 선생님 스프레드시트와 연결되지 않았어요.";
+    showToast("선생님 설정이 필요해요");
+    return;
+  }
+
+  elements.submitResultButton.disabled = true;
+  elements.submitResultButton.textContent = "제출하는 중…";
+  const selectedDans = [...state.selectedDans].sort((a, b) => a - b);
+  const uniqueMistakes = [
+    ...new Map(
+      state.mistakes.map((question) => [`${question.a}-${question.b}`, question]),
+    ).values(),
+  ];
+  const payload = {
+    studentClass: state.studentClass,
+    studentNumber: state.studentNumber,
+    dans: selectedDans.map((dan) => `${dan}단`).join(", "),
+    correct: state.correct,
+    total: QUESTIONS_PER_ROUND,
+    mistakes:
+      uniqueMistakes.length === 0
+        ? "없음"
+        : uniqueMistakes
+            .map((question) => `${question.a}×${question.b}=${question.answer}`)
+            .join(", "),
+    bestStreak: state.bestStreak,
+    stars: state.roundStars,
+    playedAt: new Date().toLocaleString("ko-KR"),
+  };
+
+  try {
+    await fetch(RESULTS_ENDPOINT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+    });
+    state.resultSubmitted = true;
+    elements.submitResultButton.classList.add("submitted");
+    elements.submitResultButton.innerHTML =
+      '<span aria-hidden="true">✓</span> 제출 완료!';
+    elements.submitStatus.textContent =
+      "선생님께 안전하게 전달했어요. 정말 잘했어요!";
+    playTone("finish");
+  } catch {
+    elements.submitResultButton.disabled = false;
+    elements.submitResultButton.innerHTML =
+      '<span aria-hidden="true">↻</span> 다시 제출하기';
+    elements.submitStatus.textContent =
+      "인터넷 연결을 확인하고 다시 눌러 주세요.";
+  }
 }
 
 let audioContext;
@@ -347,6 +435,9 @@ document.querySelector("#startChoosingButton").addEventListener("click", () => {
   playTone("tap");
 });
 elements.playButton.addEventListener("click", startGame);
+elements.studentClass.addEventListener("change", updatePlayEligibility);
+elements.studentNumber.addEventListener("input", updatePlayEligibility);
+elements.submitResultButton.addEventListener("click", submitResult);
 document.querySelector("#retryButton").addEventListener("click", startGame);
 document.querySelector("#chooseAgainButton").addEventListener("click", goHome);
 document.querySelector("#homeButton").addEventListener("click", goHome);

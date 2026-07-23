@@ -271,6 +271,81 @@ button:focus-visible {
   font-weight: 700;
 }
 
+.student-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 24px;
+  padding: 17px 20px;
+  background: #f2fbf8;
+  border: 2px solid #d9f1e8;
+  border-radius: 20px;
+}
+
+.student-info-copy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  background: white;
+  border-radius: 13px;
+  box-shadow: 0 5px 12px rgba(32, 91, 113, 0.08);
+}
+
+.student-info-copy strong {
+  display: block;
+  margin-bottom: 3px;
+  font-size: 14px;
+}
+
+.student-info-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.student-fields {
+  display: flex;
+  gap: 10px;
+}
+
+.student-fields label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.student-fields select,
+.student-fields input {
+  width: 92px;
+  height: 44px;
+  padding: 0 10px;
+  color: var(--ink);
+  background: white;
+  border: 2px solid #d7e9e5;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
+
+.student-fields select:focus,
+.student-fields input:focus {
+  border-color: var(--sky);
+  box-shadow: 0 0 0 4px rgba(25, 185, 231, 0.12);
+}
+
 .dan-grid {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -745,6 +820,39 @@ button:focus-visible {
   gap: 14px;
 }
 
+.submit-result-button {
+  min-height: 56px;
+  padding: 0 24px;
+  color: white;
+  background: linear-gradient(145deg, #25c99a, #16a77c);
+  border-radius: 18px;
+  box-shadow: 0 7px 0 #118363, 0 13px 24px rgba(27, 169, 126, 0.2);
+  font-weight: 900;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.submit-result-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.submit-result-button:disabled:not(.submitted) {
+  opacity: 0.72;
+}
+
+.submit-result-button.submitted {
+  color: #23735d;
+  background: #dff7ee;
+  box-shadow: 0 6px 0 #bae8d9;
+}
+
+.submit-status {
+  min-height: 20px;
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .secondary-button {
   color: #56717f;
   background: #edf4f5;
@@ -919,6 +1027,26 @@ button:focus-visible {
     align-items: start;
     flex-direction: column;
     gap: 8px;
+  }
+
+  .student-info {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .student-fields {
+    width: 100%;
+  }
+
+  .student-fields label {
+    flex: 1;
+  }
+
+  .student-fields select,
+  .student-fields input {
+    min-width: 0;
+    width: 100%;
   }
 
   .section-heading h2 {

@@ -60,6 +60,46 @@
               <p class="mini-guide">하나 또는 여러 개를 골라도 좋아요!</p>
             </div>
 
+            <div class="student-info" aria-labelledby="studentInfoTitle">
+              <div class="student-info-copy">
+                <span class="student-icon" aria-hidden="true">✏️</span>
+                <div>
+                  <strong id="studentInfoTitle">내 반과 번호를 알려 주세요</strong>
+                  <p>이름은 입력하지 않아요. 게임 결과는 선생님께만 전달돼요.</p>
+                </div>
+              </div>
+              <div class="student-fields">
+                <label>
+                  <span>반</span>
+                  <select id="studentClass" aria-label="반 선택">
+                    <option value="">선택</option>
+                    <option value="1">1반</option>
+                    <option value="2">2반</option>
+                    <option value="3">3반</option>
+                    <option value="4">4반</option>
+                    <option value="5">5반</option>
+                    <option value="6">6반</option>
+                    <option value="7">7반</option>
+                    <option value="8">8반</option>
+                    <option value="9">9반</option>
+                    <option value="10">10반</option>
+                  </select>
+                </label>
+                <label>
+                  <span>번호</span>
+                  <input
+                    id="studentNumber"
+                    type="number"
+                    min="1"
+                    max="40"
+                    inputmode="numeric"
+                    placeholder="예: 12"
+                    aria-label="학생 번호"
+                  />
+                </label>
+              </div>
+            </div>
+
             <div class="dan-grid" id="danGrid" aria-label="연습할 구구단 선택"></div>
 
             <div class="mission-footer">
@@ -160,8 +200,12 @@
 
             <div class="result-actions">
               <button class="secondary-button" id="chooseAgainButton">다른 단 고르기</button>
+              <button class="submit-result-button" id="submitResultButton">
+                <span aria-hidden="true">📨</span> 선생님께 제출하기
+              </button>
               <button class="primary-button" id="retryButton">한 번 더 도전! <span>↻</span></button>
             </div>
+            <p class="submit-status" id="submitStatus" role="status"></p>
           </div>
         </section>
       </main>
@@ -176,6 +220,7 @@
 
       <div class="toast" id="toast" role="status"></div>
     </div>
+    <script src="./config.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>
