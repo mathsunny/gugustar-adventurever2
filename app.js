@@ -1,6 +1,13 @@
 const QUESTIONS_PER_ROUND = 10;
 const DAN_VALUES = [2, 3, 4, 5, 6, 7, 8, 9];
 const RESULTS_ENDPOINT = window.GUGUSTAR_RESULTS_ENDPOINT || "";
+const GROWTH_STAGES = [
+  { name: "씨앗", icon: "🌰", stars: 0, message: "별을 모아 씨앗을 깨워 보세요!" },
+  { name: "새싹", icon: "🌱", stars: 10, message: "작은 새싹이 쏙 올라왔어요!" },
+  { name: "잎", icon: "🌿", stars: 30, message: "초록 잎이 힘차게 자라고 있어요!" },
+  { name: "꽃", icon: "🌸", stars: 60, message: "별빛을 머금은 꽃이 활짝 피었어요!" },
+  { name: "별나무", icon: "🌳", stars: 100, message: "멋진 별나무를 완성했어요!" },
+];
 
 const state = {
   selectedDans: new Set(),
@@ -16,6 +23,7 @@ const state = {
   studentClass: "",
   studentNumber: "",
   resultSubmitted: false,
+  starsBeforeRound: 0,
   totalStars: Number(localStorage.getItem("gugustar-total") || 0),
   mastered: JSON.parse(localStorage.getItem("gugustar-mastered") || "{}"),
 };
@@ -29,6 +37,21 @@ const elements = {
   selectedSummary: document.querySelector("#selectedSummary"),
   playButton: document.querySelector("#playButton"),
   totalStars: document.querySelector("#totalStars"),
+  walletStageIcon: document.querySelector("#walletStageIcon"),
+  growthPlant: document.querySelector("#growthPlant"),
+  growthIcon: document.querySelector("#growthIcon"),
+  growthStageName: document.querySelector("#growthStageName"),
+  growthMessage: document.querySelector("#growthMessage"),
+  growthProgress: document.querySelector("#growthProgress"),
+  growthProgressFill: document.querySelector("#growthProgressFill"),
+  growthProgressText: document.querySelector("#growthProgressText"),
+  growthStarTotal: document.querySelector("#growthStarTotal"),
+  growthStages: document.querySelector("#growthStages"),
+  resultGrowth: document.querySelector("#resultGrowth"),
+  resultGrowthIcon: document.querySelector("#resultGrowthIcon"),
+  resultGrowthTitle: document.querySelector("#resultGrowthTitle"),
+  resultGrowthMessage: document.querySelector("#resultGrowthMessage"),
+  resultGrowthFill: document.querySelector("#resultGrowthFill"),
   roundStars: document.querySelector("#roundStars"),
   questionCount: document.querySelector("#questionCount"),
   progressFill: document.querySelector("#progressFill"),
@@ -63,6 +86,68 @@ function showScreen(screen) {
   elements.screens.forEach((item) => item.classList.remove("active"));
   screen.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function getGrowthInfo(stars) {
+  let stageIndex = 0;
+  GROWTH_STAGES.forEach((stage, index) => {
+    if (stars >= stage.stars) stageIndex = index;
+  });
+  const stage = GROWTH_STAGES[stageIndex];
+  const nextStage = GROWTH_STAGES[stageIndex + 1] || null;
+  const progress = nextStage
+    ? ((stars - stage.stars) / (nextStage.stars - stage.stars)) * 100
+    : 100;
+  return {
+    stage,
+    stageIndex,
+    nextStage,
+    progress: Math.max(0, Math.min(100, progress)),
+  };
+}
+
+function renderGrowthStages(currentIndex) {
+  elements.growthStages.innerHTML = GROWTH_STAGES.map(
+    (stage, index) => `
+      <div class="growth-stage ${index <= currentIndex ? "unlocked" : ""} ${
+        index === currentIndex ? "current" : ""
+      }">
+        <span aria-hidden="true">${stage.icon}</span>
+        <strong>${stage.name}</strong>
+        <small>${stage.stars}⭐</small>
+      </div>
+    `,
+  ).join("");
+}
+
+function updateGrowthView() {
+  const info = getGrowthInfo(state.totalStars);
+  elements.walletStageIcon.textContent = info.stage.icon;
+  elements.growthIcon.textContent = info.stage.icon;
+  elements.growthStageName.textContent = info.stage.name;
+  elements.growthMessage.textContent = info.stage.message;
+  elements.growthStarTotal.textContent = state.totalStars;
+  elements.growthProgressFill.style.width = `${info.progress}%`;
+  elements.growthProgress.setAttribute("aria-valuenow", String(Math.round(info.progress)));
+  elements.growthProgressText.textContent = info.nextStage
+    ? `${info.nextStage.name}까지 별 ${info.nextStage.stars - state.totalStars}개`
+    : "별나무를 완성했어요!";
+  renderGrowthStages(info.stageIndex);
+}
+
+function updateResultGrowth(previousStars) {
+  const before = getGrowthInfo(previousStars);
+  const after = getGrowthInfo(state.totalStars);
+  const evolved = after.stageIndex > before.stageIndex;
+  elements.resultGrowth.classList.toggle("evolved", evolved);
+  elements.resultGrowthIcon.textContent = after.stage.icon;
+  elements.resultGrowthTitle.textContent = evolved
+    ? `${after.stage.name}(으)로 성장했어요!`
+    : `${after.stage.name}이(가) 별빛을 받았어요!`;
+  elements.resultGrowthMessage.textContent = after.nextStage
+    ? `${after.nextStage.name}까지 별 ${after.nextStage.stars - state.totalStars}개가 남았어요.`
+    : "최고 단계 달성! 별나무를 계속 반짝이게 해 주세요.";
+  elements.resultGrowthFill.style.width = `${after.progress}%`;
 }
 
 function renderDanButtons() {
@@ -156,6 +241,7 @@ function startGame() {
   }
   state.studentClass = elements.studentClass.value;
   state.studentNumber = String(Number(elements.studentNumber.value));
+  state.starsBeforeRound = state.totalStars;
   state.resultSubmitted = false;
   state.questions = buildQuestions();
   state.questionIndex = 0;
@@ -265,9 +351,12 @@ function hideFeedback() {
 }
 
 function finishGame() {
+  const previousStars = state.totalStars;
   state.totalStars += state.roundStars;
   localStorage.setItem("gugustar-total", state.totalStars);
   elements.totalStars.textContent = state.totalStars;
+  updateGrowthView();
+  updateResultGrowth(previousStars);
 
   [...state.selectedDans].forEach((dan) => {
     const questionsForDan = state.questions.filter((question) => question.a === dan);
@@ -484,4 +573,5 @@ document.addEventListener("keydown", (event) => {
 });
 
 elements.totalStars.textContent = state.totalStars;
+updateGrowthView();
 renderDanButtons();
