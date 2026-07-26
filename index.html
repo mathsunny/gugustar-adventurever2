@@ -25,6 +25,7 @@
         </button>
         <div class="top-actions">
           <div class="star-wallet" aria-label="모은 별">
+            <span class="wallet-stage" id="walletStageIcon" aria-hidden="true">🌰</span>
             <span aria-hidden="true">⭐</span>
             <strong id="totalStars">0</strong>
           </div>
@@ -50,6 +51,38 @@
               </button>
             </div>
           </div>
+
+          <section class="growth-card" aria-labelledby="growthTitle">
+            <div class="growth-plant" id="growthPlant" aria-hidden="true">
+              <span id="growthIcon">🌰</span>
+              <i class="growth-spark spark-one">✦</i>
+              <i class="growth-spark spark-two">★</i>
+              <i class="growth-spark spark-three">✦</i>
+            </div>
+            <div class="growth-copy">
+              <p class="kicker">나의 별빛 정원</p>
+              <h2 id="growthTitle">
+                지금은 <strong id="growthStageName">씨앗</strong> 단계예요
+              </h2>
+              <p id="growthMessage">별을 모아 씨앗을 깨워 보세요!</p>
+              <div
+                class="growth-progress"
+                id="growthProgress"
+                role="progressbar"
+                aria-label="다음 성장 단계까지의 진행률"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              >
+                <div class="growth-progress-fill" id="growthProgressFill"></div>
+              </div>
+              <div class="growth-progress-text">
+                <span id="growthProgressText">새싹까지 별 10개</span>
+                <strong>모은 별 <b id="growthStarTotal">0</b>개</strong>
+              </div>
+            </div>
+            <div class="growth-stages" id="growthStages" aria-label="별빛 정원 성장 단계"></div>
+          </section>
 
           <div class="mission-panel" id="missionPanel">
             <div class="section-heading">
@@ -190,6 +223,18 @@
               <div>
                 <span>최고 연속 정답</span>
                 <strong>🔥 <b id="bestStreak">0</b></strong>
+              </div>
+            </div>
+
+            <div class="result-growth" id="resultGrowth">
+              <div class="result-growth-icon" id="resultGrowthIcon" aria-hidden="true">🌰</div>
+              <div>
+                <span class="result-growth-label">나의 별빛 정원</span>
+                <strong id="resultGrowthTitle">씨앗이 별빛을 받았어요!</strong>
+                <p id="resultGrowthMessage">새싹까지 별 10개가 남았어요.</p>
+                <div class="result-growth-track" aria-hidden="true">
+                  <div id="resultGrowthFill"></div>
+                </div>
               </div>
             </div>
 
